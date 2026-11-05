@@ -22,13 +22,13 @@
 
 import { useState, useCallback, useEffect, useRef, type ChangeEvent } from 'react';
 import { saveAs } from 'file-saver';
+import { transientStorage } from './utils/transientStorage';
 import { DropZone }          from './components/ui/DropZone';
 import { ProgressBar }       from './components/ui/ProgressBar';
 import { MarkdownViewer }    from './components/ui/MarkdownViewer';
 import { SolutionSidebar }   from './components/SolutionSidebar';
 import { ThemeToggle }       from './components/ui/ThemeToggle';
 import { HeaderDropdown } from './components/ui/HeaderDropdown';
-import { UpdateChecker }     from './components/ui/UpdateChecker';
 import { parseSolutionZip }  from './parser/solutionParser';
 import {
   DEFAULT_DOCUMENTATION_SETTINGS,
@@ -299,7 +299,7 @@ function buildImportedMarkdownSolution(displayName: string): ParsedSolution {
 
 function readSavedConfigurations(): SavedDocumentConfiguration[] {
   try {
-    const raw = localStorage.getItem(LOCAL_CONFIG_STORAGE_KEY);
+    const raw = transientStorage.getItem(LOCAL_CONFIG_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
@@ -322,7 +322,7 @@ function readSavedConfigurations(): SavedDocumentConfiguration[] {
 
 function writeSavedConfigurations(configs: SavedDocumentConfiguration[]): void {
   try {
-    localStorage.setItem(LOCAL_CONFIG_STORAGE_KEY, JSON.stringify(configs));
+    transientStorage.setItem(LOCAL_CONFIG_STORAGE_KEY, JSON.stringify(configs));
   } catch {
     // Best effort only; continue without blocking UX.
   }
@@ -330,7 +330,7 @@ function writeSavedConfigurations(configs: SavedDocumentConfiguration[]): void {
 
 function readHiddenConfigurationIds(): string[] {
   try {
-    const raw = localStorage.getItem(LOCAL_HIDDEN_CONFIG_IDS_KEY);
+    const raw = transientStorage.getItem(LOCAL_HIDDEN_CONFIG_IDS_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
@@ -342,7 +342,7 @@ function readHiddenConfigurationIds(): string[] {
 
 function writeHiddenConfigurationIds(ids: string[]): void {
   try {
-    localStorage.setItem(LOCAL_HIDDEN_CONFIG_IDS_KEY, JSON.stringify(ids));
+    transientStorage.setItem(LOCAL_HIDDEN_CONFIG_IDS_KEY, JSON.stringify(ids));
   } catch {
     // Best effort only; continue without blocking UX.
   }
@@ -1148,8 +1148,6 @@ export default function App() {
                 ＋ New
               </button>
             )}
-            <a className={styles.headerBtn} href="https://github.com/Hart365/PP-MD" target="_blank" rel="noreferrer" aria-label="PP-MD on GitHub (opens in a new tab)">GitHub</a>
-            <UpdateChecker />
             <ThemeToggle />
           </div>
           {(isProcessing || batchExportFormat !== null) && (

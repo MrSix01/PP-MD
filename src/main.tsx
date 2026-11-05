@@ -14,6 +14,14 @@ import { createRoot } from 'react-dom/client';
 import { ThemeProvider } from './context/ThemeContext';
 import App              from './App';
 
+// Production builds are silent: nothing is written to the browser console.
+if (import.meta.env.PROD) {
+  const noop = () => undefined;
+  for (const method of ['log', 'info', 'warn', 'error', 'debug', 'trace'] as const) {
+    console[method] = noop;
+  }
+}
+
 // Import global styles first so they form the cascade base
 import './assets/global.css';
 

@@ -16,9 +16,6 @@ vi.mock('../components/ui/ThemeToggle', () => ({
   ThemeToggle: () => null,
 }));
 
-vi.mock('../components/ui/UpdateChecker', () => ({
-  UpdateChecker: () => null,
-}));
 
 /** Expand a collapsible section by its heading text. */
 async function expandSection(heading: RegExp) {

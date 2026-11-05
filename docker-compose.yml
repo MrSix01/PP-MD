@@ -1,0 +1,33 @@
+# The app sits on an internal-only network (no route to the internet).
+# A tiny TCP relay bridges the published port to it; it never initiates connections
+# beyond the app and carries no logs.
+services:
+  pp-md:
+    build: .
+    environment:
+      PPMD_MODE: ${PPMD_MODE:-production}
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    tmpfs: ["/tmp:size=16m,noexec,nosuid"]
+    logging:
+      driver: none
+    networks: [internal]
+    restart: unless-stopped
+
+  gateway:
+    image: alpine/socat:latest
+    command: ["-d0", "TCP-LISTEN:8080,fork,reuseaddr", "TCP:pp-md:8080"]
+    ports: ["127.0.0.1:${HOST_PORT:-8080}:8080"]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    logging:
+      driver: none
+    networks: [internal, edge]
+    depends_on: [pp-md]
+
+networks:
+  internal:
+    internal: true
+  edge: {}

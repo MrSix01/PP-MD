@@ -2,7 +2,7 @@
  * @file ThemeContext.tsx
  * @description React context for managing light/dark theme across the app.
  * Reads the user's OS preference via the `prefers-color-scheme` media query
- * and persists the choice to localStorage.  Applies the chosen theme as a
+ * and persists the choice to transientStorage.  Applies the chosen theme as a
  * `data-theme` attribute on <html> so that CSS custom properties can switch
  * all colours in one place.
  *
@@ -13,6 +13,7 @@
  *    meet 3:1 against their backgrounds.
  */
 
+import { transientStorage } from '../utils/transientStorage';
 import {
   createContext,
   useContext,
@@ -62,7 +63,7 @@ const STORAGE_KEY = 'pp-md-theme';
  */
 function getInitialTheme(): Theme {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = transientStorage.getItem(STORAGE_KEY);
     if (stored === 'light' || stored === 'dark') return stored;
   } catch {
     // localStorage may be blocked (e.g. private browsing with strict settings)
@@ -109,7 +110,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     applyTheme(theme);
     try {
-      localStorage.setItem(STORAGE_KEY, theme);
+      transientStorage.setItem(STORAGE_KEY, theme);
     } catch {
       // Ignore storage errors
     }
@@ -121,7 +122,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const handleChange = (e: MediaQueryListEvent) => {
       // Only react to OS change if the user has NOT manually set a preference
       try {
-        const stored = localStorage.getItem(STORAGE_KEY);
+        const stored = transientStorage.getItem(STORAGE_KEY);
         if (!stored) {
           setThemeState(e.matches ? 'dark' : 'light');
         }
