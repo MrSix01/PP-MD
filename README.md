@@ -8,6 +8,22 @@ See [Accessibility statement](ACCESSIBILITY.MD), [contributing guide](CONTRIBUTI
 
 ---
 
+> **Standalone container edition.** PP-MD now runs as a self-contained Docker container serving a web UI. All processing happens in the browser; the server has no upload endpoint, no persistence and no outbound access. Results leave only when you download them (ZIP export).
+
+## Running with Docker
+
+```sh
+cp .env.example .env        # PPMD_MODE=production (default) or development
+docker compose up --build   # open http://127.0.0.1:8080
+```
+
+- `PPMD_MODE=production`: all logging disabled, nothing written to stdout/stderr, Docker log driver `none`.
+- The app container sits on an `internal: true` network (no internet route); a socat gateway publishes the port on localhost only.
+- Read-only filesystem, all capabilities dropped, strict CSP (`connect-src 'self'`), `no-store` caching, no browser storage (settings/themes are in memory only).
+- Update checks, external links and the Electron-only desktop PDF path have been removed.
+
+---
+
 ## Table of Contents
 
 - [What It Does](#what-it-does)
